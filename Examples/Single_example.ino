@@ -7,6 +7,10 @@ void setup() {
     Wire.begin();
     
     ads.address(0x48); // Default I2C address
+
+    // ADS1115 supports 4 different I²C addresses based on the ADDR pin connection:
+    // 0x48 ,0x49 ,0x4A ,0x4B
+    
     ads.begin(RANGE_6_144V, SPS_128, SINGLE_SHOT_MODE);
 
     // ===== Available Configurations =====
