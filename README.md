@@ -16,55 +16,19 @@ A simple library for interfacing with the ADS1115 ADC using I2C.
 
 ### Example Code
 
-```cpp#include <ADS1115.h>
+```cpp
+#include "My_ADS_1115.h"
 
-ADS1115 ads;
+My_ADS_1115 ads;
 
 void setup() {
-    Serial.begin(115200);
-    
-    // Initialize ADS1115 with selected voltage range, sample rate, and mode
-    ads.begin(RANGE_4_096V, SPS_128, SINGLE_SHOT_MODE);
-    
-    // ads.begin(RANGE_6_144V, SPS_860, CONTINUOUS_MODE); // Alternative option
-
-    /*
-      Available sample rate (SPS) options:
-      SPS_8    = 8 SPS
-      SPS_16   = 16 SPS
-      SPS_32   = 32 SPS
-      SPS_64   = 64 SPS
-      SPS_128  = 128 SPS (default)
-      SPS_250  = 250 SPS
-      SPS_475  = 475 SPS
-      SPS_860  = 860 SPS (fastest)
-
-      Available voltage range (RANGE) options:
-      RANGE_6_144V = ±6.144V
-      RANGE_4_096V = ±4.096V
-      RANGE_2_048V = ±2.048V (default)
-      RANGE_1_024V = ±1.024V
-      RANGE_0_512V = ±0.512V
-      RANGE_0_256V = ±0.256V
-
-      Available ADC modes:
-      CONTINUOUS_MODE  = The ADC continuously converts data in the background.
-      SINGLE_SHOT_MODE = The ADC takes a single measurement when requested, then powers down to save energy.
-    */
+  Serial.begin(115200);
+  ads.begin(RANGE_4_096V, SPS_128, CONTINUOUS_MODE);
 }
 
 void loop() {
-    ads.readAllChannels();
-
-    for (int i = 0; i < 4; i++) {
-        Serial.print("AIN");
-        Serial.print(i);
-        Serial.print(": ");
-        Serial.println(ads.getValue(i));
-    }
-
-    Serial.println();
-    delay(1000);
+  ads.readAllChannels();
+  delay(1000);
 }
 ```
 
