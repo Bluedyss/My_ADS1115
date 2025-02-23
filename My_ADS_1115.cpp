@@ -1,35 +1,35 @@
 #include "My_ADS_1115.h"
 
-My_ADS_1115::My_ADS_1115() {}
+My_ADS_1115::My_ADS_1115(uint8_t address) {
+  _address = address;
+}
 
 void My_ADS_1115::begin(ADCRange range, SampleRate rate, ADCMode mode) {
-  currentRange = range;
-  currentSampleRate = rate;
-  currentMode = mode;
+  _range = range;
+  _rate = rate;
+  _mode = mode;
   Wire.begin();
 }
 
-void My_ADS_1115::configureADC(uint8_t channel) {
-  uint16_t config = 0x8583;
+void My_ADS_1115::configureADC(ADS_MUX mux) {
+  uint16_t config = 0x8000;  // Start single conversion
 
-  // Set mode (Bit 8)
-  config &= ~(0x0100);
-  config |= currentMode;
+  // Set MUX
+  config |= mux;
 
-  // Set sample rate (Bits 7-5)
-  config &= ~(0x00E0);
-  config |= currentSampleRate;
+  // Set gain
+  config |= _range;
 
-  // Set voltage range (Bits 11-9)
-  config &= ~(0x0E00);
-  config |= currentRange;
+  // Set mode
+  config |= _mode;
 
-  // Set MUX channel selection (Bits 14-12)
-  config &= ~(0x7000);
-  config |= muxSettings[channel];
+  // Set sample rate
+  config |= _rate;
 
-  // Write configuration to ADS1115
-  Wire.beginTransmission(ADS1115_ADDRESS);
+  // Disable comparator
+  config |= 0x0003;
+
+  Wire.beginTransmission(_address);
   Wire.write(0x01);
   Wire.write(config >> 8);
   Wire.write(config & 0xFF);
@@ -37,10 +37,10 @@ void My_ADS_1115::configureADC(uint8_t channel) {
 }
 
 int16_t My_ADS_1115::readADC() {
-  Wire.beginTransmission(ADS1115_ADDRESS);
+  Wire.beginTransmission(_address);
   Wire.write(0x00);
   Wire.endTransmission();
-  Wire.requestFrom(ADS1115_ADDRESS, 2);
+  Wire.requestFrom(_address, (uint8_t)2);
 
   if (Wire.available() == 2) {
     return (Wire.read() << 8) | Wire.read();
@@ -48,14 +48,17 @@ int16_t My_ADS_1115::readADC() {
   return 0;
 }
 
-void My_ADS_1115::readAllChannels() {
-  for (int i = 0; i < 4; i++) {
-    configureADC(i);
-    delay(100);
-    Serial.print("AIN");
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.println(readADC());
-  }
-  Serial.println();
+int16_t My_ADS_1115::readChannel(uint8_t channel) {
+  if (channel > 3) return 0;
+  ADS_MUX mux = (ADS_MUX)(ADS_MUX_AIN0_GND + (channel * 0x1000));
+  configureADC(mux);
+  delay(10);
+  return readADC();
 }
+
+int16_t My_ADS_1115::readDifferential(ADS_MUX mux) {
+  configureADC(mux);
+  delay(10);
+  return readADC();
+}
+
