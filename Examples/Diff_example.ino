@@ -39,15 +39,19 @@ void setup() {
 }
 
 void loop() {
-    int16_t diff_0_1 = ads.readChannel(0); // AIN0 - AIN1
-    int16_t diff_2_3 = ads.readChannel(1); // AIN2 - AIN3
-
-    Serial.print("Differential AIN0-AIN1: ");
-    Serial.println(diff_0_1);
+    Serial.print("AIN0-AIN1: ");
+    Serial.println(ads.readDifferential(ADS_MUX_AIN0_AIN1));
     
-    Serial.print("Differential AIN2-AIN3: ");
-    Serial.println(diff_2_3);
+    Serial.print("AIN0-AIN3: ");
+    Serial.println(ads.readDifferential(ADS_MUX_AIN0_AIN3));
 
+    Serial.print("AIN1-AIN3: ");
+    Serial.println(ads.readDifferential(ADS_MUX_AIN1_AIN3));
+
+    Serial.print("AIN2-AIN3: ");
+    Serial.println(ads.readDifferential(ADS_MUX_AIN2_AIN3));
+
+    Serial.println("------------------");
     delay(1000);
 }
 
